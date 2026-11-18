@@ -1,0 +1,56 @@
+{
+  "name": "rtxswitch",
+  "productName": "RTXSwitch",
+  "version": "1.0.0",
+  "description": "Force any app or game to run on your NVIDIA RTX GPU instead of integrated graphics — one click.",
+  "main": "src/main.js",
+  "author": {
+    "name": "Shishir",
+    "email": "sishishir737@gmail.com"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Shishir-ip/RTX-Switch",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Shishir-ip/RTX-Switch.git"
+  },
+  "type": "commonjs",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.shishir.rtxswitch",
+    "productName": "RTXSwitch",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/icon.ico"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "artifactName": "RTXSwitch-Setup-${version}.${ext}",
+      "shortcutName": "RTXSwitch",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false
+    }
+  }
+}
