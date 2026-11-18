@@ -145,16 +145,31 @@ function rowIconHtml(a) {
     <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg>
   </div>`;
 }
+async function fetchIconSafe(exePath) {
+  // never let a stuck native call wedge icon loading
+  try {
+    const res = await Promise.race([
+      window.rtx.getIcons([exePath]),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('icon timeout')), 5000)),
+    ]);
+    if (res && res.ok && res.data) {
+      const url = Object.values(res.data)[0];
+      if (url) return url;
+    }
+  } catch {}
+  return null;
+}
 async function loadIcons() {
-  const pending = state.apps.filter((a) => a.exists !== false && !iconCache.has(a.exePath));
-  const BATCH = 14;
-  for (let i = 0; i < pending.length; i += BATCH) {
-    const chunk = pending.slice(i, i + BATCH);
-    try {
-      const res = await window.rtx.getIcons(chunk.map((a) => a.exePath));
-      const map = (res && res.ok && res.data) || {};
-      for (const [exe, url] of Object.entries(map)) {
-        const slot = document.querySelector(`.row[data-exe="${CSS.escape(exe)}"] [data-icon-slot]`);
+  const queue = state.apps.filter((a) => a.exists !== false && !iconCache.has(a.exePath));
+  let idx = 0;
+  const WORKERS = 3;
+  const worker = async () => {
+    while (idx < queue.length) {
+      const a = queue[idx++];
+      const url = await fetchIconSafe(a.exePath);
+      if (url) {
+        iconCache.set(a.exePath, url);
+        const slot = document.querySelector(`.row[data-exe="${CSS.escape(a.exePath)}"] [data-icon-slot]`);
         if (slot) {
           const img = document.createElement('img');
           img.className = 'row-icon';
@@ -164,9 +179,10 @@ async function loadIcons() {
           slot.replaceWith(img);
         }
       }
-    } catch {}
-    await new Promise((r) => setTimeout(r, 16)); // yield so UI stays snappy
-  }
+      await new Promise((r) => setTimeout(r, 10)); // yield so UI stays snappy
+    }
+  };
+  await Promise.all(Array.from({ length: WORKERS }, worker));
 }
 
 /* ---------------------------------------------------------------- */

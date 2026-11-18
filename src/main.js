@@ -307,27 +307,36 @@ function saveCustomApps(list) {
 /* ------------------------------------------------------------------ */
 /* Icons                                                               */
 /* ------------------------------------------------------------------ */
-async function getIconDataUrl(exePath) {
-  const norm = path.normalize(exePath);
-  if (iconMemCache.has(norm)) return iconMemCache.get(norm);
-  const key = crypto.createHash('sha1').update(norm.toLowerCase()).digest('hex');
-  const cached = path.join(ICON_DIR, `${key}.png`);
-  try {
-    if (fs.existsSync(cached)) {
-      const url = `data:image/png;base64,${fs.readFileSync(cached).toString('base64')}`;
+/* app.getFileIcon must NOT be called concurrently on Windows — batches
+   of parallel native extractions can hang forever. Serialize every call
+   through a single queue. */
+let iconQueue = Promise.resolve();
+function getIconDataUrl(exePath) {
+  const run = async () => {
+    const norm = path.normalize(exePath);
+    if (iconMemCache.has(norm)) return iconMemCache.get(norm);
+    const key = crypto.createHash('sha1').update(norm.toLowerCase()).digest('hex');
+    const cached = path.join(ICON_DIR, `${key}.png`);
+    try {
+      if (fs.existsSync(cached)) {
+        const url = `data:image/png;base64,${fs.readFileSync(cached).toString('base64')}`;
+        iconMemCache.set(norm, url);
+        return url;
+      }
+    } catch {}
+    if (!fileExists(norm)) return null;
+    try {
+      const icon = await app.getFileIcon(norm, { size: 'large' }); // 48px
+      const png = icon.toPNG();
+      try { fs.mkdirSync(ICON_DIR, { recursive: true }); fs.writeFileSync(cached, png); } catch {}
+      const url = `data:image/png;base64,${png.toString('base64')}`;
       iconMemCache.set(norm, url);
       return url;
-    }
-  } catch {}
-  if (!fileExists(norm)) return null;
-  try {
-    const icon = await app.getFileIcon(norm, { size: 'large' }); // 48px
-    const png = icon.toPNG();
-    try { fs.mkdirSync(ICON_DIR, { recursive: true }); fs.writeFileSync(cached, png); } catch {}
-    const url = `data:image/png;base64,${png.toString('base64')}`;
-    iconMemCache.set(norm, url);
-    return url;
-  } catch { return null; }
+    } catch { return null; }
+  };
+  const result = iconQueue.then(run, run);
+  iconQueue = result.then(() => undefined, () => undefined); // keep chain alive
+  return result;
 }
 
 /* ------------------------------------------------------------------ */

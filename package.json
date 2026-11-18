@@ -1,7 +1,7 @@
 {
   "name": "rtxswitch",
   "productName": "RTXSwitch",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Force any app or game to run on your NVIDIA RTX GPU instead of integrated graphics — one click.",
   "main": "src/main.js",
   "author": {

@@ -17,7 +17,7 @@
 ---
 
 <p align="center">
-  <img src="assets/screenshot.png" alt="RTXSwitch app screenshot — GPU control center with RTX 4060 detected" width="820"/>
+  <img src="assets/screenshots/dashboard.png" alt="RTXSwitch app screenshot — GPU control center with RTX 4060 detected" width="820"/>
 </p>
 
 Laptops with AMD or Intel integrated graphics often run apps and games on the
@@ -29,6 +29,19 @@ It uses the **official Windows per-app GPU preference system** — the exact sam
 one behind *Settings → System → Display → Graphics* — so behavior is identical
 to Windows itself, just instant and 100× faster to use.
 
+## 📸 Screenshots
+
+| | |
+|:---:|:---:|
+| **Live GPU detection** | **“On RTX” filter** |
+| ![GPU dashboard](assets/screenshots/dashboard.png) | ![On RTX filter](assets/screenshots/on-rtx.png) |
+| **Instant search** | **Bulk actions** |
+| ![Instant search](assets/screenshots/search.png) | ![Bulk actions](assets/screenshots/bulk-menu.png) |
+| **Safe confirmation dialogs** | **Settings** |
+| ![Confirmation dialog](assets/screenshots/confirm.png) | ![Settings](assets/screenshots/settings.png) |
+| **Drag & drop any .exe** | **Toast feedback** |
+| ![Drag and drop](assets/screenshots/drag-drop.png) | ![Toast feedback](assets/screenshots/toast.png) |
+
 ## ✨ Features
 
 - 🔍 **Auto-discovers your installed apps & games** — Start Menu, Steam libraries, Epic Games
@@ -38,12 +51,13 @@ to Windows itself, just instant and 100× faster to use.
 - 🧹 **Bulk actions** — force RTX on everything visible, or reset all to Windows default
 - 🔎 Instant **search & filters** (On RTX / Power saving / Auto)
 - 🗂️ Preserves Windows' own settings (like `SwapEffectUpgradeEnable`) when editing
+- 🧠 Flags stale entries — apps you uninstalled show as *Not found*, easy to clean up
 - 🖥️ Close-to-tray, launch-at-startup, single-instance
 - 🎨 Premium dark UI with smooth animations — built with Electron
 
 ## ⬇️ Install
 
-1. Grab **`RTXSwitch-Setup-1.0.0.exe`** from the [**Releases**](../../releases/latest) page
+1. Grab **`RTXSwitch-Setup-1.0.1.exe`** from the [**Releases**](../../releases/latest) page
 2. Run it — installs per-user, **no administrator rights needed**
 3. Pick an app, click **RTX**, done ✅
 
